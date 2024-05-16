@@ -11,9 +11,9 @@
         "BugReportUrl": "https://github.com/ccatterina/plasmusic-toolbar/issues",
         "Website": "https://github.com/ccatterina/plasmusic-toolbar",
         "Icon": "view-media-track",
-        "Id": "plasmusic-toolbar",
+        "Id": "zk-plasmusic-toolbar",
         "License": "GPL3",
-        "Name": "PlasMusic Toolbar",
+        "Name": "zk PlasMusic",
         "Version": "1.2.1",
         "Category": "Multimedia"
     },
@@ -22,4 +22,3 @@
         "org.kde.plasma.multimediacontrols"
     ]
 }
-

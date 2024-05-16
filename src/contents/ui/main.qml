@@ -10,6 +10,7 @@ PlasmoidItem {
     id: widget
 
     Plasmoid.status: PlasmaCore.Types.HiddenStatus
+    preferredRepresentation: compactRepresentation
 
     readonly property font textFont: {
         return plasmoid.configuration.useCustomFont ? plasmoid.configuration.customFont : Kirigami.Theme.defaultFont
@@ -25,11 +26,22 @@ PlasmoidItem {
         }
     }
 
+    Timer {
+        id: updatepos
+        interval: 200;
+        running: true;
+        repeat: true
+        onTriggered: () => {
+            player.updatePosition()
+        }
+    }
+
     compactRepresentation: Item {
         id: compact
 
-        Layout.preferredWidth: row.implicitWidth + Kirigami.Units.smallSpacing * 2
+        Layout.preferredWidth: 1920
         Layout.fillHeight: true
+        Layout.fillWidth: true
 
         readonly property real controlsSize: Math.min(height, Kirigami.Units.iconSizes.medium)
 
@@ -38,6 +50,13 @@ PlasmoidItem {
             onClicked: {
                 widget.expanded = !widget.expanded;
             }
+        }
+
+        Rectangle {
+            color: "#00ff00"
+            opacity: 0.3
+            height: parent.height
+            width: (player.songPosition / player.songLength) * parent.width
         }
 
         RowLayout {
@@ -57,67 +76,63 @@ PlasmoidItem {
 
 
             Item {
-                visible: plasmoid.configuration.separateText
                 Layout.preferredHeight: column.implicitHeight
-                Layout.preferredWidth: column.implicitWidth
+                Layout.fillWidth: true
 
                 ColumnLayout {
                     id: column
                     spacing: 0
                     anchors.fill: parent
+
                     ScrollingText {
+                        maxWidth: parent.width
                         overflowBehaviour: plasmoid.configuration.textScrollingBehaviour
                         font: widget.boldTextFont
                         speed: plasmoid.configuration.textScrollingSpeed
-                        maxWidth: plasmoid.configuration.maxSongWidthInPanel
                         text: player.title
                     }
                     ScrollingText {
+                        maxWidth: parent.width
                         overflowBehaviour: plasmoid.configuration.textScrollingBehaviour
                         font: widget.textFont
                         speed: plasmoid.configuration.textScrollingSpeed
-                        maxWidth: plasmoid.configuration.maxSongWidthInPanel
                         text: player.artists
                     }
                 }
             }
 
-            ScrollingText {
-                visible: !plasmoid.configuration.separateText
-                overflowBehaviour: plasmoid.configuration.textScrollingBehaviour
-                speed: plasmoid.configuration.textScrollingSpeed
-                maxWidth: plasmoid.configuration.maxSongWidthInPanel
-                text: [player.artists, player.title].filter((x) => x).join(" - ")
-                font: widget.textFont
-            }
+            RowLayout {
+                width: 200
 
-            PlasmaComponents3.ToolButton {
-                visible: plasmoid.configuration.commandsInPanel
-                enabled: player.canGoPrevious
-                icon.name: "media-skip-backward"
-                implicitWidth: compact.controlsSize
-                implicitHeight: compact.controlsSize
-                onClicked: player.previous()
-            }
+                PlasmaComponents3.ToolButton {
+                    visible: plasmoid.configuration.commandsInPanel
+                    enabled: player.canGoPrevious
+                    icon.name: "media-skip-backward"
+                    implicitWidth: compact.controlsSize
+                    implicitHeight: compact.controlsSize
+                    onClicked: player.previous()
+                }
 
-            PlasmaComponents3.ToolButton {
-                visible: plasmoid.configuration.commandsInPanel
-                enabled: player.playbackStatus === Mpris.PlaybackStatus.Playing ? player.canPause : player.canPlay
-                implicitWidth: compact.controlsSize
-                implicitHeight: compact.controlsSize
-                icon.name: player.playbackStatus === Mpris.PlaybackStatus.Playing ? "media-playback-pause" : "media-playback-start"
-                onClicked: player.playPause()
-            }
+                PlasmaComponents3.ToolButton {
+                    visible: plasmoid.configuration.commandsInPanel
+                    enabled: player.playbackStatus === Mpris.PlaybackStatus.Playing ? player.canPause : player.canPlay
+                    implicitWidth: compact.controlsSize
+                    implicitHeight: compact.controlsSize
+                    icon.name: player.playbackStatus === Mpris.PlaybackStatus.Playing ? "media-playback-pause" : "media-playback-start"
+                    onClicked: player.playPause()
+                }
 
-            PlasmaComponents3.ToolButton {
-                visible: plasmoid.configuration.commandsInPanel
-                enabled: player.canGoNext
-                implicitWidth: compact.controlsSize
-                implicitHeight: compact.controlsSize
-                icon.name: "media-skip-forward"
-                onClicked: player.next()
+                PlasmaComponents3.ToolButton {
+                    visible: plasmoid.configuration.commandsInPanel
+                    enabled: player.canGoNext
+                    implicitWidth: compact.controlsSize
+                    implicitHeight: compact.controlsSize
+                    icon.name: "media-skip-forward"
+                    onClicked: player.next()
+                }
             }
         }
+
     }
 
     fullRepresentation: Item {
